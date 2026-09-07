@@ -6,7 +6,7 @@ export default function GuestRoute() {
     const isGuest = useAuthVerification();
     
     if(isGuest) {
-        return <Navigate to="/admin" replace/>
+        return <Navigate to="/redirect" replace/>
     }
     
     return <Outlet/>

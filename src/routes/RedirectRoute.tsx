@@ -1,4 +1,4 @@
-import { AvailablePortals } from "@/common/constants/portals";
+import { AvailablePortals, PortalRoutePaths } from "@/common/constants/portals";
 import type { UserType } from "@/common/types/common";
 import useAuthVerification from "@/hooks/useAuthVerification";
 import localStorageKeys from "@/lib/config/localStorage";
@@ -9,24 +9,25 @@ import { Navigate } from "react-router-dom";
 export default function RedirectRoute() {
     const [userType,setUserType] = useState<UserType|null>(null);
     const isAuthenticated = useAuthVerification();
-    const redirectUser = () => {
+
+    useEffect(() => {
         const type = localStorage.getItem(localStorageKeys.userTypeReference)
         if(type && AvailablePortals.includes(type)) {
             setUserType(type as UserType);
         }
-    }
-    if(!isAuthenticated) {
-        return <Navigate to="/" replace/>
-    }
-    
-    useEffect(() => {
-        redirectUser();
     },[])
 
-
-    if(userType === null  ) {
+    if(isAuthenticated === null) {
         return null;
     }
 
-    return <Navigate to={`/${userType}`} replace/>
+    if(!isAuthenticated) {
+        return <Navigate to="/" replace/>
+    }
+
+    if(userType === null) {
+        return null;
+    }
+
+    return <Navigate to={PortalRoutePaths[userType]} replace/>
 }
