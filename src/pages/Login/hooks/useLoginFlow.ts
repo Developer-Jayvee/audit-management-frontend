@@ -3,6 +3,7 @@ import type { LoginStep, Portal } from '../types/types';
 import { emailLogin, postLogin } from '@/services/auth/auth.service';
 import { RoleEnum } from '@/common/constants/roles';
 import localStorageKeys from '@/lib/config/localStorage';
+import { useConfirm } from '@/contexts/ConfirmDialogContext';
 import { useNavigate } from 'react-router-dom';
 
 // const MOCK_DELAY_MS = 600;
@@ -18,6 +19,7 @@ export function useLoginFlow() {
   const [busy, setBusy] = useState(false);
 
   const navigate = useNavigate();
+  const confirm = useConfirm();
   const submitEmail = useCallback(async (value: string) => {
     setBusy(true);
     const normalized = value.trim().toLowerCase();
@@ -38,27 +40,35 @@ export function useLoginFlow() {
   }, []);
 
   const submitPassword = useCallback(async (password: string) => {
+    const confirmed = await confirm({
+      title: `Log in to the ${portal?.name ?? 'selected'} portal?`,
+      description: `You're signing in as ${email}.`,
+      confirmLabel: 'Log in',
+      cancelLabel: 'Cancel',
+    });
+    if (!confirmed) return null;
+
     setBusy(true);
     await postLogin(password)
     .then((result) => {
       if(result) {
         if(
-          !localStorage.getItem(localStorageKeys.authReference) || 
+          !localStorage.getItem(localStorageKeys.authReference) ||
           !localStorage.getItem(localStorageKeys.userTypeReference)
         ) {
           localStorage.setItem(localStorageKeys.authReference,JSON.stringify(result?.data?.data));
           localStorage.setItem(localStorageKeys.userTypeReference,result?.data?.data?.user_type);
         }
-        
+
         return navigate('/redirect');
-        
+
       }
     });
 
     setBusy(false);
 
     return null;
-  }, []);
+  }, [confirm, portal, email, navigate]);
 
   const backToEmail = useCallback(() => {
     setStep('email');

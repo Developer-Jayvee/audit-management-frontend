@@ -18,6 +18,7 @@
   --color-atlas-error-text: #2c455d;
   --color-atlas-positive: #5c7a5c;
   --color-atlas-negative: #9c5a4a;
+  --color-atlas-warning: #a3813f;
 }
 
 body {
