@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+@theme {
+  --font-sans: "Barlow", system-ui, sans-serif;
+  --font-condensed: "Barlow Condensed", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-atlas-ink: #1d1f20;
+  --color-atlas-paper: #f2f2f3;
+  --color-atlas-field: #e9e9ea;
+  --color-atlas-navy: #1d2d3d;
+  --color-atlas-accent: #94bce3;
+  --color-atlas-blue: #5980a6;
+  --color-atlas-blue-hover: #597ea3;
+  --color-atlas-blue-active: #416180;
+  --color-atlas-blue-text: #416180;
+  --color-atlas-error-text: #2c455d;
+  --color-atlas-positive: #5c7a5c;
+  --color-atlas-negative: #9c5a4a;
+}
+
+body {
+  margin: 0;
+  color: var(--color-atlas-ink);
+  background: var(--color-atlas-paper);
+  font-family: var(--font-sans);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::placeholder {
+  color: rgb(29 31 32 / 35%);
+}
