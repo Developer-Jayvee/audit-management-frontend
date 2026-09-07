@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import useLogout from '@/hooks/useLogout';
 
 interface AppLayoutProps {
   title: string;
@@ -12,7 +13,7 @@ const NAV_LINK_ACTIVE = 'border-atlas-blue text-atlas-ink';
 const NAV_LINK_INACTIVE = 'border-transparent text-atlas-ink/60 hover:text-atlas-ink';
 
 export function AppLayout({ title, children }: AppLayoutProps) {
-  const navigate = useNavigate();
+  const logout = useLogout();
   const [assetsMenuOpen, setAssetsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -90,7 +91,7 @@ export function AppLayout({ title, children }: AppLayoutProps) {
         <div className="flex flex-none items-center gap-4">
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => logout()}
             className="cursor-pointer border-0 bg-transparent font-condensed text-[12.5px] font-semibold tracking-[0.08em] text-atlas-blue-text uppercase hover:text-atlas-navy"
           >
             Sign out

@@ -6,6 +6,7 @@ import type { DefaultResponse, UserData, UserType } from "@/common/types/common"
 const verfiyEmailURL = 'auth/verify-email';
 const userLogin = 'auth/login';
 const isAuthenticatedURL = 'auth/validate';
+const logoutURL = 'auth/logout';
 
 export const emailLogin = async ({ email } : PostLoginEmail) => {
     await getCSRFToken();
@@ -38,7 +39,18 @@ export const checkAuth = async () => {
         await httpClient.get(isAuthenticatedURL);
         return true;
     } catch (error) {
-        return false;        
+        return false;
     }
-    
+
+}
+
+/**
+ * Ends the current user's session on the backend (invalidates the Sanctum session).
+ * Rejects if the request fails so callers can tell a confirmed logout apart
+ * from one they only cleared client-side.
+ *
+ * @returns {Promise<void>} Resolves once the backend confirms the session is invalidated.
+ */
+export const logout = async () => {
+    await httpClient.get(logoutURL);
 }
