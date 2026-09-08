@@ -5,14 +5,15 @@ import type { CreateUserPayload, UpdateUserPayload, User } from './types';
 const usersURL = 'users';
 
 /**
- * Fetches every account in the system (all four roles) for the admin
- * User Management list.
+ * Fetches one page of accounts (all four roles) for the admin User
+ * Management list.
  *
- * @returns {Promise<User[]>} The current page of accounts.
+ * @param page - {number} The 1-indexed page to fetch. Defaults to 1.
+ * @returns {Promise<PaginatedResponse<User>>} The requested page, plus total/last_page for pagination controls.
  */
-export const getUsers = async (): Promise<User[]> => {
-  const response = await httpClient.get<PaginatedResponse<User>>(usersURL);
-  return response.data.data;
+export const getUsers = async (page = 1): Promise<PaginatedResponse<User>> => {
+  const response = await httpClient.get<PaginatedResponse<User>>(usersURL, { params: { page } });
+  return response.data;
 };
 
 /**

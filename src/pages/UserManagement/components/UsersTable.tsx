@@ -7,13 +7,25 @@ interface UsersTableProps {
   users: User[];
   loading: boolean;
   error: string | null;
+  page: number;
+  lastPage: number;
+  onPageChange: (page: number) => void;
   onEdit: (user: User) => void;
   onToggleActive: (user: User) => void;
 }
 
 const COLUMNS = 'grid-cols-[1.4fr_1.8fr_1fr_0.8fr_1fr]';
 
-export function UsersTable({ users, loading, error, onEdit, onToggleActive }: UsersTableProps) {
+export function UsersTable({
+  users,
+  loading,
+  error,
+  page,
+  lastPage,
+  onPageChange,
+  onEdit,
+  onToggleActive,
+}: UsersTableProps) {
   return (
     <section className="border border-atlas-ink/14">
       <div
@@ -56,6 +68,32 @@ export function UsersTable({ users, loading, error, onEdit, onToggleActive }: Us
           </div>
         ))}
       </DataState>
+
+      {!loading && !error && lastPage > 1 && (
+        <div className="flex items-center justify-between border-t border-atlas-ink/14 px-5 py-3 text-[12.5px] text-atlas-ink/60">
+          <span>
+            Page {page} of {lastPage}
+          </span>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => onPageChange(page - 1)}
+              className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-blue-text uppercase hover:text-atlas-navy disabled:cursor-not-allowed disabled:text-atlas-ink/30"
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              disabled={page >= lastPage}
+              onClick={() => onPageChange(page + 1)}
+              className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-blue-text uppercase hover:text-atlas-navy disabled:cursor-not-allowed disabled:text-atlas-ink/30"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

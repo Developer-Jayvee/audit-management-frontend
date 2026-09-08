@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/Button';
 import { useConfirm } from '@/contexts/ConfirmDialogContext';
+import { showErrorToast } from '@/lib/toast';
 import { createUser, setUserActive, updateUser } from '@/services/users/users.service';
 import type { User } from '@/services/users/types';
 import { UsersTable } from './components/UsersTable';
@@ -8,7 +9,7 @@ import { UserFormDialog, type UserFormValues } from './components/UserFormDialog
 import { useUsers } from './hooks/useUsers';
 
 export default function UserManagementPage() {
-  const { data: users, loading, error, refetch } = useUsers();
+  const { users, page, lastPage, loading, error, setPage, refetch } = useUsers();
   const confirm = useConfirm();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -35,6 +36,8 @@ export default function UserManagementPage() {
       }
       setDialogOpen(false);
       await refetch();
+    } catch {
+      showErrorToast(editingUser ? 'Failed to update account. Please try again.' : 'Failed to create account. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -52,8 +55,12 @@ export default function UserManagementPage() {
     });
     if (!confirmed) return;
 
-    await setUserActive(user.id, activating);
-    await refetch();
+    try {
+      await setUserActive(user.id, activating);
+      await refetch();
+    } catch {
+      showErrorToast(activating ? 'Failed to reactivate account. Please try again.' : 'Failed to deactivate account. Please try again.');
+    }
   }
 
   return (
@@ -68,6 +75,9 @@ export default function UserManagementPage() {
         users={users}
         loading={loading}
         error={error}
+        page={page}
+        lastPage={lastPage}
+        onPageChange={setPage}
         onEdit={openEditDialog}
         onToggleActive={handleToggleActive}
       />
