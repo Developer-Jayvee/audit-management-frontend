@@ -19,6 +19,26 @@ export const userSchema = z.object({
     user_type : z.enum(RoleTypes)
 })
 
+/**
+ * Schema for creating a new account — the edit schema plus a required
+ * password, since an edit never resets a password through the main form.
+ */
+export const createUserSchema = userSchema.extend({
+    password: z.string().min(8, "Password must be at least 8 characters"),
+})
+
 export interface UserData extends z.infer<typeof userSchema> {
     id : number | string;
+    is_active : boolean;
+}
+
+/**
+ * Shape returned by every list endpoint backed by
+ * `QueryRepository::getQuery()` (a Laravel `LengthAwarePaginator`).
+ */
+export interface PaginatedResponse<D = unknown> {
+    current_page : number;
+    data : D[];
+    last_page : number;
+    total : number;
 }

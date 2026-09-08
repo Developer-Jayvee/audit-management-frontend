@@ -9,26 +9,82 @@ interface AppLayoutProps {
   children: ReactNode;
 }
 
+interface NavSubItem {
+  label: string;
+  path: string;
+  end?: boolean;
+}
+
+interface NavModule {
+  label: string;
+  path: string;
+  allow: UserType[];
+  submenu?: NavSubItem[];
+}
+
 const NAV_LINK_BASE =
   'inline-flex items-center border-b-2 px-1 font-sans text-sm whitespace-nowrap transition-colors';
 const NAV_LINK_ACTIVE = 'border-atlas-blue text-atlas-ink';
 const NAV_LINK_INACTIVE = 'border-transparent text-atlas-ink/60 hover:text-atlas-ink';
 
+// The Phase 2.1 module tree (docs/development-phases.md §"Module tree
+// (decided in 2.1)") and its RBAC mapping (§"RBAC mapping (2.1 decision)"),
+// in one place so adding a module means adding a config entry, not
+// copy-pasting the dropdown markup again.
+const NAV_MODULES: NavModule[] = [
+  {
+    label: 'User Management',
+    path: 'users',
+    allow: ['admin'],
+  },
+  {
+    label: 'Client Management',
+    path: 'clients',
+    allow: ['admin'],
+    submenu: [
+      { label: 'All Clients', path: 'clients', end: true },
+      { label: 'All Stores', path: 'clients/stores' },
+      { label: 'All Branches', path: 'clients/branches' },
+    ],
+  },
+  {
+    label: 'Asset Management',
+    path: 'assets',
+    allow: ['admin'],
+    submenu: [
+      { label: 'Assets', path: 'assets', end: true },
+      { label: 'Asset Assignment', path: 'assets/assignment' },
+    ],
+  },
+  {
+    label: 'Audit Management',
+    path: 'audit',
+    allow: ['admin', 'auditor'],
+    submenu: [
+      { label: 'Audit Requests', path: 'audit/requests' },
+      { label: 'Field Audits', path: 'audit/field-audits' },
+      { label: 'Findings Review', path: 'audit/findings' },
+      { label: 'Tickets', path: 'audit/tickets' },
+    ],
+  },
+];
+
 export function AppLayout({ title, userType, children }: AppLayoutProps) {
   const logout = useLogout();
-  const [assetsMenuOpen, setAssetsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const canSeeAssetManagement = userType === 'admin';
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const navRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setAssetsMenuOpen(false);
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setOpenMenu(null);
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const visibleModules = NAV_MODULES.filter((module) => userType && module.allow.includes(userType));
 
   return (
     <div className="flex min-h-screen flex-col bg-atlas-paper">
@@ -38,7 +94,7 @@ export function AppLayout({ title, userType, children }: AppLayoutProps) {
           <span className="font-condensed text-[19px] font-semibold tracking-[0.2em]">ATLAS</span>
         </div>
 
-        <nav className="flex min-w-0 flex-1 items-stretch gap-1">
+        <nav ref={navRef} className="flex min-w-0 flex-1 items-stretch gap-1">
           <NavLink
             to="dashboard"
             end
@@ -47,49 +103,57 @@ export function AppLayout({ title, userType, children }: AppLayoutProps) {
             Dashboard
           </NavLink>
 
-          {canSeeAssetManagement && (
-            <div ref={menuRef} className="relative ml-6 flex items-stretch">
-              <NavLink
-                to="assets"
-                onClick={(event) => {
-                  event.preventDefault();
-                  setAssetsMenuOpen((open) => !open);
-                }}
-                className={({ isActive }) => `${NAV_LINK_BASE} cursor-pointer gap-2 ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
-              >
-                Asset Management
-                <span
-                  className="text-[9px] leading-none opacity-70 transition-transform duration-150"
-                  style={{ transform: `rotate(${assetsMenuOpen ? 90 : 0}deg)` }}
+          {visibleModules.map((module) =>
+            module.submenu ? (
+              <div key={module.path} className="relative ml-6 flex items-stretch">
+                <NavLink
+                  to={module.path}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setOpenMenu((current) => (current === module.path ? null : module.path));
+                  }}
+                  className={({ isActive }) =>
+                    `${NAV_LINK_BASE} cursor-pointer gap-2 ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`
+                  }
                 >
-                  ▶
-                </span>
-              </NavLink>
+                  {module.label}
+                  <span
+                    className="text-[9px] leading-none opacity-70 transition-transform duration-150"
+                    style={{ transform: `rotate(${openMenu === module.path ? 90 : 0}deg)` }}
+                  >
+                    ▶
+                  </span>
+                </NavLink>
 
-              {assetsMenuOpen && (
-                <div className="absolute top-full left-0 flex min-w-[210px] flex-col border border-atlas-ink/18 bg-atlas-paper p-1">
-                  <NavLink
-                    to="assets/assignment"
-                    onClick={() => setAssetsMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
-                    }
-                  >
-                    Asset Assignment
-                  </NavLink>
-                  <NavLink
-                    to="assets"
-                    end
-                    onClick={() => setAssetsMenuOpen(false)}
-                    className={({ isActive }) =>
-                      `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
-                    }
-                  >
-                    Assets
-                  </NavLink>
-                </div>
-              )}
-            </div>
+                {openMenu === module.path && (
+                  <div className="absolute top-full left-0 flex min-w-[210px] flex-col border border-atlas-ink/18 bg-atlas-paper p-1">
+                    {module.submenu.map((item) => (
+                      <NavLink
+                        key={item.path}
+                        to={item.path}
+                        end={item.end}
+                        onClick={() => setOpenMenu(null)}
+                        className={({ isActive }) =>
+                          `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
+                        }
+                      >
+                        {item.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <NavLink
+                key={module.path}
+                to={module.path}
+                className={({ isActive }) =>
+                  `${NAV_LINK_BASE} ml-6 ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`
+                }
+              >
+                {module.label}
+              </NavLink>
+            )
           )}
         </nav>
 
