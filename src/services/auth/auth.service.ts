@@ -2,6 +2,7 @@ import httpClient from "@/lib/axios"
 import type { PostLoginEmail } from "./types";
 import axios from "axios";
 import type { DefaultResponse, UserData, UserType } from "@/common/types/common";
+import { env } from "@/lib/config/env";
 
 const verfiyEmailURL = 'auth/verify-email';
 const userLogin = 'auth/login';
@@ -30,8 +31,7 @@ export const postLogin = async (password : string) => {
 }
 
 export const getCSRFToken = async () => {
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    await axios.get(`${baseUrl}/sanctum/csrf-cookie`);
+    await axios.get(`${env.baseUrl}/sanctum/csrf-cookie`);
 }
 
 export const checkAuth = async () => {
