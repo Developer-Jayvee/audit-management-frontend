@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import useLogout from '@/hooks/useLogout';
+import type { UserType } from '@/common/types/common';
 
 interface AppLayoutProps {
   title: string;
+  userType: UserType | null;
   children: ReactNode;
 }
 
@@ -12,10 +14,11 @@ const NAV_LINK_BASE =
 const NAV_LINK_ACTIVE = 'border-atlas-blue text-atlas-ink';
 const NAV_LINK_INACTIVE = 'border-transparent text-atlas-ink/60 hover:text-atlas-ink';
 
-export function AppLayout({ title, children }: AppLayoutProps) {
+export function AppLayout({ title, userType, children }: AppLayoutProps) {
   const logout = useLogout();
   const [assetsMenuOpen, setAssetsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const canSeeAssetManagement = userType === 'admin';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -44,48 +47,50 @@ export function AppLayout({ title, children }: AppLayoutProps) {
             Dashboard
           </NavLink>
 
-          <div ref={menuRef} className="relative ml-6 flex items-stretch">
-            <NavLink
-              to="assets"
-              onClick={(event) => {
-                event.preventDefault();
-                setAssetsMenuOpen((open) => !open);
-              }}
-              className={({ isActive }) => `${NAV_LINK_BASE} cursor-pointer gap-2 ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
-            >
-              Asset Management
-              <span
-                className="text-[9px] leading-none opacity-70 transition-transform duration-150"
-                style={{ transform: `rotate(${assetsMenuOpen ? 90 : 0}deg)` }}
+          {canSeeAssetManagement && (
+            <div ref={menuRef} className="relative ml-6 flex items-stretch">
+              <NavLink
+                to="assets"
+                onClick={(event) => {
+                  event.preventDefault();
+                  setAssetsMenuOpen((open) => !open);
+                }}
+                className={({ isActive }) => `${NAV_LINK_BASE} cursor-pointer gap-2 ${isActive ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
               >
-                ▶
-              </span>
-            </NavLink>
+                Asset Management
+                <span
+                  className="text-[9px] leading-none opacity-70 transition-transform duration-150"
+                  style={{ transform: `rotate(${assetsMenuOpen ? 90 : 0}deg)` }}
+                >
+                  ▶
+                </span>
+              </NavLink>
 
-            {assetsMenuOpen && (
-              <div className="absolute top-full left-0 flex min-w-[210px] flex-col border border-atlas-ink/18 bg-atlas-paper p-1">
-                <NavLink
-                  to="assets/assignment"
-                  onClick={() => setAssetsMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
-                  }
-                >
-                  Asset Assignment
-                </NavLink>
-                <NavLink
-                  to="assets"
-                  end
-                  onClick={() => setAssetsMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
-                  }
-                >
-                  Assets
-                </NavLink>
-              </div>
-            )}
-          </div>
+              {assetsMenuOpen && (
+                <div className="absolute top-full left-0 flex min-w-[210px] flex-col border border-atlas-ink/18 bg-atlas-paper p-1">
+                  <NavLink
+                    to="assets/assignment"
+                    onClick={() => setAssetsMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
+                    }
+                  >
+                    Asset Assignment
+                  </NavLink>
+                  <NavLink
+                    to="assets"
+                    end
+                    onClick={() => setAssetsMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `flex min-h-9 items-center px-3 text-[13.5px] hover:bg-atlas-blue/14 ${isActive ? 'bg-atlas-blue/14' : ''}`
+                    }
+                  >
+                    Assets
+                  </NavLink>
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         <div className="flex flex-none items-center gap-4">
