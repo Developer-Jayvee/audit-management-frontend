@@ -6,8 +6,8 @@ const TONE_CLASSES: Record<StatusTone, string> = {
   negative: 'border-atlas-negative text-atlas-negative',
 };
 
-const POSITIVE_STATUSES = ['approved', 'counted', 'active', 'completed', 'resolved'];
-const NEGATIVE_STATUSES = ['escalated', 'missing', 'rejected', 'overdue', 'inactive'];
+const POSITIVE_STATUSES = ['approved', 'counted', 'active', 'completed', 'resolved', 'passed'];
+const NEGATIVE_STATUSES = ['escalated', 'missing', 'rejected', 'overdue', 'inactive', 'declined', 'rescheduled'];
 
 function toneFor(status: string): StatusTone {
   const normalized = status.trim().toLowerCase();

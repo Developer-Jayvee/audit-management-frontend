@@ -13,16 +13,16 @@ const UserManagementPage = lazy(
 const ClientsPage = lazy(() => import("@/pages/Clients/ClientsPage"));
 const StoresPage = lazy(() => import("@/pages/Stores/StoresPage"));
 const BranchesPage = lazy(() => import("@/pages/Branches/BranchesPage"));
-const ComingSoonPage = lazy(() => import("@/pages/ComingSoon/ComingSoonPage"));
-
-// Phase 2.1 nav-shell stub routes: no feature code yet, just the route/RBAC
-// boundary each module will be built behind in 2.5.
-const AUDIT_MANAGEMENT_STUBS = [
-  { path: "audit/requests", title: "Audit Requests" },
-  { path: "audit/field-audits", title: "Field Audits" },
-  { path: "audit/findings", title: "Findings Review" },
-  { path: "audit/tickets", title: "Tickets" },
-];
+const AuditRequestsPage = lazy(
+  () => import("@/pages/AuditRequests/AuditRequestsPage"),
+);
+const FieldAuditsPage = lazy(
+  () => import("@/pages/FieldAudits/FieldAuditsPage"),
+);
+const FindingsReviewPage = lazy(
+  () => import("@/pages/FindingsReview/FindingsReviewPage"),
+);
+const TicketsPage = lazy(() => import("@/pages/Tickets/TicketsPage"));
 
 const AdminRoutes = [
   {
@@ -102,15 +102,42 @@ const AdminRoutes = [
       title: "All Branches",
     },
   },
-  ...AUDIT_MANAGEMENT_STUBS.map(({ path, title }) => ({
-    path,
+  {
+    path: "audit/requests",
     element: (
       <RoleGuard allow={["admin", "auditor"]}>
-        <ComingSoonPage description={`${title} is built in Phase 2.5.`} />
+        <AuditRequestsPage />
       </RoleGuard>
     ),
-    handle: { title },
-  })),
+    handle: { title: "Audit Requests" },
+  },
+  {
+    path: "audit/field-audits",
+    element: (
+      <RoleGuard allow={["admin", "auditor"]}>
+        <FieldAuditsPage />
+      </RoleGuard>
+    ),
+    handle: { title: "Field Audits" },
+  },
+  {
+    path: "audit/findings",
+    element: (
+      <RoleGuard allow={["admin", "auditor"]}>
+        <FindingsReviewPage />
+      </RoleGuard>
+    ),
+    handle: { title: "Findings Review" },
+  },
+  {
+    path: "audit/tickets",
+    element: (
+      <RoleGuard allow={["admin", "auditor"]}>
+        <TicketsPage />
+      </RoleGuard>
+    ),
+    handle: { title: "Tickets" },
+  },
 ];
 
 export default AdminRoutes;

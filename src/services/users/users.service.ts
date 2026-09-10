@@ -1,6 +1,6 @@
 import httpClient from '@/lib/axios';
 import type { DefaultResponse, PaginatedResponse } from '@/common/types/common';
-import type { CreateUserPayload, UpdateUserPayload, User } from './types';
+import type { CreateUserPayload, FieldEngineerUser, UpdateUserPayload, User } from './types';
 
 const usersURL = 'users';
 
@@ -13,6 +13,23 @@ const usersURL = 'users';
  */
 export const getUsers = async (page = 1): Promise<PaginatedResponse<User>> => {
   const response = await httpClient.get<PaginatedResponse<User>>(usersURL, { params: { page } });
+  return response.data;
+};
+
+/**
+ * Fetches one page of Field Engineer accounts — sources the picker options
+ * for Field Audits → Assign (Phase 2.5). Each account includes its
+ * `field_engineer_profile`, whose `id` (not the account's own `id`) is
+ * what `assignFieldEngineer()` expects.
+ *
+ * @param page - {number} The 1-indexed page to fetch. Defaults to 1.
+ * @param perPage - {number} Page size. Defaults to 10.
+ * @returns {Promise<PaginatedResponse<FieldEngineerUser>>} The requested page, plus total/last_page for pagination controls.
+ */
+export const getFieldEngineers = async (page = 1, perPage = 10): Promise<PaginatedResponse<FieldEngineerUser>> => {
+  const response = await httpClient.get<PaginatedResponse<FieldEngineerUser>>(usersURL, {
+    params: { page, per_page: perPage, user_type: 'field_engineer' },
+  });
   return response.data;
 };
 
