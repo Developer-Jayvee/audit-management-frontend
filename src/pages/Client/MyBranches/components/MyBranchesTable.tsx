@@ -1,67 +1,57 @@
 import { DataState } from '@/components/DataState';
 import { StatusBadge } from '@/components/StatusBadge';
-import type { Client } from '@/services/clients/types';
+import type { Branch } from '@/services/branches/types';
 
-interface ClientsTableProps {
-  clients: Client[];
+interface MyBranchesTableProps {
+  branches: Branch[];
   loading: boolean;
   error: string | null;
   page: number;
   lastPage: number;
   onPageChange: (page: number) => void;
-  onEdit: (client: Client) => void;
-  onToggleActive: (client: Client) => void;
+  onEdit: (branch: Branch) => void;
 }
 
-const COLUMNS = 'grid-cols-[1.4fr_1.8fr_1.4fr_1fr_0.8fr_1fr]';
+const COLUMNS = 'grid-cols-[1fr_1.6fr_1fr_0.8fr_0.8fr]';
 
-export function ClientsTable({
-  clients,
-  loading,
-  error,
-  page,
-  lastPage,
-  onPageChange,
-  onEdit,
-  onToggleActive,
-}: ClientsTableProps) {
+/**
+ * Table of the authenticated Client's own branches. No Client ID column
+ * (every row here already belongs to the viewer's own organization).
+ *
+ * @param props - {MyBranchesTableProps} The branches to render, load state, paging, and the edit handler.
+ * @returns {JSX.Element} The rendered table.
+ */
+export function MyBranchesTable({ branches, loading, error, page, lastPage, onPageChange, onEdit }: MyBranchesTableProps) {
   return (
     <section className="border border-atlas-ink/14">
       <div
         className={`grid ${COLUMNS} gap-3 border-b border-atlas-ink/14 px-5 py-[9px] font-mono text-[10px] tracking-[0.1em] text-atlas-ink/50 uppercase`}
       >
-        <span>Name</span>
-        <span>Email</span>
-        <span>Contact No.</span>
-        <span>Linked Account</span>
+        <span>Store ID</span>
+        <span>Complete Address</span>
+        <span>Region/City</span>
         <span>Status</span>
         <span>Actions</span>
       </div>
-      <DataState loading={loading} error={error} empty={clients.length === 0} emptyLabel="No client organizations found.">
-        {clients.map((client) => (
+      <DataState loading={loading} error={error} empty={branches.length === 0} emptyLabel="No branches yet.">
+        {branches.map((branch) => (
           <div
-            key={client.id}
+            key={branch.id}
             className={`grid ${COLUMNS} items-center gap-3 border-b border-atlas-ink/8 px-5 py-3 text-[13.5px] last:border-b-0`}
           >
-            <span className="truncate">{client.name}</span>
-            <span className="truncate">{client.email ?? '—'}</span>
-            <span className="truncate">{client.contact_no}</span>
-            <span className="truncate">{client.user_id ? `User #${client.user_id}` : '— Unlinked —'}</span>
-            <StatusBadge status={client.is_active ? 'Active' : 'Inactive'} />
+            <span className="truncate">{branch.store_id}</span>
+            <span className="truncate">{branch.complete_address}</span>
+            <span className="truncate">
+              {branch.region_id ?? '—'} / {branch.city_id ?? '—'}
+            </span>
+            <StatusBadge status={branch.is_active ? 'Active' : 'Inactive'} />
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => onEdit(client)}
+                onClick={() => onEdit(branch)}
                 className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-blue-text uppercase hover:text-atlas-navy"
               >
                 Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggleActive(client)}
-                className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-negative uppercase hover:text-atlas-negative/80"
-              >
-                {client.is_active ? 'Deactivate' : 'Reactivate'}
               </button>
             </div>
           </div>

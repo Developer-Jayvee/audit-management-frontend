@@ -34,6 +34,22 @@ export const getFieldEngineers = async (page = 1, perPage = 10): Promise<Paginat
 };
 
 /**
+ * Fetches one page of Client-role accounts — sources the "Linked Client
+ * Account" picker on Client Management → All Clients (Phase 3.1), so an
+ * Admin can link a `clients` organization to the login that manages it.
+ *
+ * @param page - {number} The 1-indexed page to fetch. Defaults to 1.
+ * @param perPage - {number} Page size. Defaults to 10.
+ * @returns {Promise<PaginatedResponse<User>>} The requested page, plus total/last_page for pagination controls.
+ */
+export const getClientAccounts = async (page = 1, perPage = 10): Promise<PaginatedResponse<User>> => {
+  const response = await httpClient.get<PaginatedResponse<User>>(usersURL, {
+    params: { page, per_page: perPage, user_type: 'client' },
+  });
+  return response.data;
+};
+
+/**
  * Creates a new account of any of the four roles.
  *
  * @param payload - {CreateUserPayload} The account's profile, role, and initial password.

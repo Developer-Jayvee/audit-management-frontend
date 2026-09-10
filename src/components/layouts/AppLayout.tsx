@@ -67,6 +67,15 @@ const NAV_MODULES: NavModule[] = [
       { label: 'Tickets', path: 'audit/tickets' },
     ],
   },
+  {
+    label: 'My Stores & Branches',
+    path: 'stores',
+    allow: ['client'],
+    submenu: [
+      { label: 'My Stores', path: 'stores', end: true },
+      { label: 'My Branches', path: 'branches' },
+    ],
+  },
 ];
 
 export function AppLayout({ title, userType, children }: AppLayoutProps) {

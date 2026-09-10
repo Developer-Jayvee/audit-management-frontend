@@ -11,17 +11,21 @@ import { useClients } from './hooks/useClients';
 /**
  * Strips empty-string optional fields down to `undefined` so they're
  * omitted from the request instead of failing the backend's `nullable`
- * rules with `""`.
+ * rules with `""`. `user_id` is the exception — an empty selection means
+ * "unlink this organization from any login," which must be sent as an
+ * explicit `null`, not omitted (an omitted `user_id` on an edit would
+ * leave an existing link untouched).
  *
  * @param values - {ClientFormValues} The raw form values.
- * @returns {ClientFormValues} The same values with blank optional fields removed.
+ * @returns {ClientFormValues & { user_id: string | null }} The same values with blank optional fields removed.
  */
-function cleanOptionalFields(values: ClientFormValues): ClientFormValues {
+function cleanOptionalFields(values: ClientFormValues) {
   return {
     ...values,
     email: values.email || undefined,
     city_id: values.city_id || undefined,
     region_id: values.region_id || undefined,
+    user_id: values.user_id || null,
   };
 }
 

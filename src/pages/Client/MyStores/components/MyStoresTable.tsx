@@ -1,67 +1,57 @@
 import { DataState } from '@/components/DataState';
 import { StatusBadge } from '@/components/StatusBadge';
-import type { Client } from '@/services/clients/types';
+import type { Store } from '@/services/stores/types';
 
-interface ClientsTableProps {
-  clients: Client[];
+interface MyStoresTableProps {
+  stores: Store[];
   loading: boolean;
   error: string | null;
   page: number;
   lastPage: number;
   onPageChange: (page: number) => void;
-  onEdit: (client: Client) => void;
-  onToggleActive: (client: Client) => void;
+  onEdit: (store: Store) => void;
 }
 
-const COLUMNS = 'grid-cols-[1.4fr_1.8fr_1.4fr_1fr_0.8fr_1fr]';
+const COLUMNS = 'grid-cols-[1.6fr_1fr_1fr_0.8fr_0.8fr]';
 
-export function ClientsTable({
-  clients,
-  loading,
-  error,
-  page,
-  lastPage,
-  onPageChange,
-  onEdit,
-  onToggleActive,
-}: ClientsTableProps) {
+/**
+ * Table of the authenticated Client's own stores. No Client ID column
+ * (every row here already belongs to the viewer's own organization) and no
+ * deactivate action — deleting/deactivating a store isn't part of the
+ * Phase 3.1 Client checklist, unlike the admin oversight view's table.
+ *
+ * @param props - {MyStoresTableProps} The stores to render, load state, paging, and the edit handler.
+ * @returns {JSX.Element} The rendered table.
+ */
+export function MyStoresTable({ stores, loading, error, page, lastPage, onPageChange, onEdit }: MyStoresTableProps) {
   return (
     <section className="border border-atlas-ink/14">
       <div
         className={`grid ${COLUMNS} gap-3 border-b border-atlas-ink/14 px-5 py-[9px] font-mono text-[10px] tracking-[0.1em] text-atlas-ink/50 uppercase`}
       >
         <span>Name</span>
-        <span>Email</span>
+        <span>Branch ID</span>
         <span>Contact No.</span>
-        <span>Linked Account</span>
         <span>Status</span>
         <span>Actions</span>
       </div>
-      <DataState loading={loading} error={error} empty={clients.length === 0} emptyLabel="No client organizations found.">
-        {clients.map((client) => (
+      <DataState loading={loading} error={error} empty={stores.length === 0} emptyLabel="No stores yet.">
+        {stores.map((store) => (
           <div
-            key={client.id}
+            key={store.id}
             className={`grid ${COLUMNS} items-center gap-3 border-b border-atlas-ink/8 px-5 py-3 text-[13.5px] last:border-b-0`}
           >
-            <span className="truncate">{client.name}</span>
-            <span className="truncate">{client.email ?? '—'}</span>
-            <span className="truncate">{client.contact_no}</span>
-            <span className="truncate">{client.user_id ? `User #${client.user_id}` : '— Unlinked —'}</span>
-            <StatusBadge status={client.is_active ? 'Active' : 'Inactive'} />
+            <span className="truncate">{store.name}</span>
+            <span className="truncate">{store.branch_id ?? '—'}</span>
+            <span className="truncate">{store.contact_no ?? '—'}</span>
+            <StatusBadge status={store.is_active ? 'Active' : 'Inactive'} />
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => onEdit(client)}
+                onClick={() => onEdit(store)}
                 className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-blue-text uppercase hover:text-atlas-navy"
               >
                 Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => onToggleActive(client)}
-                className="cursor-pointer border-0 bg-transparent p-0 font-condensed text-[12.5px] font-semibold tracking-[0.06em] text-atlas-negative uppercase hover:text-atlas-negative/80"
-              >
-                {client.is_active ? 'Deactivate' : 'Reactivate'}
               </button>
             </div>
           </div>

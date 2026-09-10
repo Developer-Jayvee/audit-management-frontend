@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import RoleGuard from "./RoleGuard";
 
 const ClientDashboardPage = lazy(() => import("@/pages/Client/ClientDashboardPage"));
+const MyStoresPage = lazy(() => import("@/pages/Client/MyStores/MyStoresPage"));
+const MyBranchesPage = lazy(() => import("@/pages/Client/MyBranches/MyBranchesPage"));
 
 const ClientRoutes = [
   {
@@ -18,6 +20,28 @@ const ClientRoutes = [
     ),
     handle: {
       title: "Dashboard",
+    },
+  },
+  {
+    path: "stores",
+    element: (
+      <RoleGuard allow={["client"]} redirectTo="/redirect">
+        <MyStoresPage />
+      </RoleGuard>
+    ),
+    handle: {
+      title: "My Stores",
+    },
+  },
+  {
+    path: "branches",
+    element: (
+      <RoleGuard allow={["client"]} redirectTo="/redirect">
+        <MyBranchesPage />
+      </RoleGuard>
+    ),
+    handle: {
+      title: "My Branches",
     },
   },
 ];
