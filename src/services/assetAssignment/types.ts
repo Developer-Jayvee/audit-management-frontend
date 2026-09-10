@@ -1,8 +1,3 @@
-export interface AssetAssignment {
-  id: string;
-  tag: string;
-  assignedTo: string;
-  branch: string;
-  since: string;
-  status: string;
+export interface AssignAssetPayload {
+  store_id: number | string;
 }
