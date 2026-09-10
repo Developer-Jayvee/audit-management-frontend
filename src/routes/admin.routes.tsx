@@ -10,16 +10,13 @@ const AssetAssignmentPage = lazy(
 const UserManagementPage = lazy(
   () => import("@/pages/UserManagement/UserManagementPage"),
 );
+const ClientsPage = lazy(() => import("@/pages/Clients/ClientsPage"));
+const StoresPage = lazy(() => import("@/pages/Stores/StoresPage"));
+const BranchesPage = lazy(() => import("@/pages/Branches/BranchesPage"));
 const ComingSoonPage = lazy(() => import("@/pages/ComingSoon/ComingSoonPage"));
 
 // Phase 2.1 nav-shell stub routes: no feature code yet, just the route/RBAC
-// boundary each module will be built behind in 2.3/2.5.
-const CLIENT_MANAGEMENT_STUBS = [
-  { path: "clients", title: "All Clients" },
-  { path: "clients/stores", title: "All Stores" },
-  { path: "clients/branches", title: "All Branches" },
-];
-
+// boundary each module will be built behind in 2.5.
 const AUDIT_MANAGEMENT_STUBS = [
   { path: "audit/requests", title: "Audit Requests" },
   { path: "audit/field-audits", title: "Field Audits" },
@@ -72,15 +69,39 @@ const AdminRoutes = [
       title : "Asset Assignment"
     }
   },
-  ...CLIENT_MANAGEMENT_STUBS.map(({ path, title }) => ({
-    path,
+  {
+    path: "clients",
     element: (
       <RoleGuard allow={["admin"]}>
-        <ComingSoonPage description={`${title} is built in Phase 2.3.`} />
+        <ClientsPage />
       </RoleGuard>
     ),
-    handle: { title },
-  })),
+    handle: {
+      title: "All Clients",
+    },
+  },
+  {
+    path: "clients/stores",
+    element: (
+      <RoleGuard allow={["admin"]}>
+        <StoresPage />
+      </RoleGuard>
+    ),
+    handle: {
+      title: "All Stores",
+    },
+  },
+  {
+    path: "clients/branches",
+    element: (
+      <RoleGuard allow={["admin"]}>
+        <BranchesPage />
+      </RoleGuard>
+    ),
+    handle: {
+      title: "All Branches",
+    },
+  },
   ...AUDIT_MANAGEMENT_STUBS.map(({ path, title }) => ({
     path,
     element: (

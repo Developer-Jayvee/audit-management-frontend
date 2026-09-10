@@ -8,7 +8,10 @@ import localStorageKeys from "@/lib/config/localStorage";
 export default function ProtectedRoutes() {
     const isUserAuthenticated = useAuthVerification();
     const matches = useMatches();
-    const currentRoute = matches[matches.length - 1];
+    // react-router's `handle` is untyped (`unknown`) by design — each route
+    // sets its own shape via `handle: { title: ... }`, so it's cast here
+    // rather than at every route definition.
+    const currentRoute = matches[matches.length - 1] as { handle?: { title?: string } } | undefined;
     const userType = localStorage.getItem(localStorageKeys.userTypeReference) as UserType | null;
 
     if(isUserAuthenticated === null) {
